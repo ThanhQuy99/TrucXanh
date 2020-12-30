@@ -18,13 +18,22 @@ cc.Class({
 
     onLoad () {
         //window.item = this;
-        this.node.setLabel = this.setLabel.bind(this);
+        this.index=0;
+
+        this.node.setIndex = this.setIndex.bind(this);
         this.node.changeToSymbol = this.changeToSymbol.bind(this);
         this.node.checkAccept = this.checkAccept.bind(this);
+        this.node.resetSymbol = this.resetSymbol.bind(this);
+        this.node.firstClick = this.firstClick.bind(this);
+        this.node.secondClick = this.secondClick.bind(this);
        // this.resetSize();
         this.node.on("SETID",this.changeToSymbol,this);
-        this.node.on("SET_LABLE_COVER",this.setLabel,this);
-        this.node.on("CHECK_ACCEPT",this.checkAccept,this);
+        this.node.on("SET_INDEX",this.setIndex,this);
+        this.node.on("RESET_SYMBOL",this.resetSymbol,this);
+        this.node.on("FIRST_CLICK",this.firstClick,this);
+        this.node.on("SECOND_CLICK",this.secondClick,this);
+        
+        
     },
     
     onClick(evt,index){
@@ -35,12 +44,25 @@ cc.Class({
       //this.node.dispatchEvent( new cc.Event.EventCustom('SYMBOL_HAS_CLICK', true) );
 
       this.clickItemEvent = new cc.Event.EventCustom('SYMBOL_HAS_CLICK', true);
-      let id = this.symbolID;
+      //let id = this.symbolID;
       this.clickItemEvent.setUserData({
               id: this.symbolID,
+              index: this.index,
           });
       this.node.dispatchEvent(this.clickItemEvent);
 
+    },
+
+    firstClick(){
+        cc.log('this is first click');
+    },
+    secondClick(id){
+        if(id==this.symbolID){
+            
+        }else{
+
+        }
+        //cc.log('this is second click');
     },
 
     hidenCover () {
@@ -53,11 +75,12 @@ cc.Class({
        // cc.log(this.symbolID);
         return this.symbolID;
     },
-    setLabel(num){
+    setIndex(num){
         this.lable.string=num;
+        this.index=num;
         //cc.log('change',num);
     },
-    resetPrefab(){
+    resetSymbol(){
         this.staticSymbol.active=true;
         this.cover.active=true;
     },

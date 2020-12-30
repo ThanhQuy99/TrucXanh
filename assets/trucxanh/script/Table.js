@@ -13,7 +13,7 @@ cc.Class({
     
     onLoad () {
         window.item = this;
-        this.isFirtClick=false;
+        this.isFirstClick=false;
         this.matrix=[];
         this.loadMatrix();
         this.symbols = [];  
@@ -47,7 +47,7 @@ cc.Class({
             item.setPosition(cc.v2(x,y));
             this.symbols.push(item);
             this.table.addChild(item,i,'Symbol'+i);
-            item.emit("SET_LABLE_COVER",i+1);
+            item.emit("SET_INDEX",i+1);
             item.emit("SETID",this.matrix[i]);
         }
         
@@ -65,12 +65,19 @@ cc.Class({
 
     symbolClick(ev){
         ev.stopPropagation();
-        let symbolID = ev.getUserData();
-        if( this.isFirtClick=false){
+        const symbol = ev.getUserData();
+        const {id, index} = symbol;
+        if(!this.isFirstClick){
             
+            this.symbols[index].emit("FIRST_CLICK",id);
+            this.isFirstClick=true;
+        }else{
+            this.symbols[index].emit("SECOND_CLICK",id);
+            this.isFirstClick=false;
         }
-      
-        cc.log(symbolID);
+      //  cc.log(this.symbolFirt.id,this.symbolSecond.id);
+        
     },
+    
     
 });
