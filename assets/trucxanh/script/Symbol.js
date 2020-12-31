@@ -22,23 +22,21 @@ cc.Class({
 
         this.node.setIndex = this.setIndex.bind(this);
         this.node.changeToSymbol = this.changeToSymbol.bind(this);
-        this.node.checkAccept = this.checkAccept.bind(this);
         this.node.resetSymbol = this.resetSymbol.bind(this);
-        this.node.firstClick = this.firstClick.bind(this);
-        this.node.secondClick = this.secondClick.bind(this);
+        this.node.hidenSymbol = this.hidenSymbol.bind(this);
+        this.node.hidenCover = this.hidenCover.bind(this);
        // this.resetSize();
         this.node.on("SETID",this.changeToSymbol,this);
         this.node.on("SET_INDEX",this.setIndex,this);
         this.node.on("RESET_SYMBOL",this.resetSymbol,this);
-        this.node.on("FIRST_CLICK",this.firstClick,this);
-        this.node.on("SECOND_CLICK",this.secondClick,this);
-        
+        this.node.on("HIDEN_SYMBOL",this.hidenSymbol,this);
+        this.node.on("HIDEN_COVER",this.hidenCover,this);
         
     },
     
     onClick(evt,index){
-        this.hidenCover();
-        this.getSymbolID();
+       // this.hidenCover();
+        //this.getSymbolID();
       //  cc.error(evt, index);
      // this.node.emit("SYMBOL_HAS_CLICK",index);
       //this.node.dispatchEvent( new cc.Event.EventCustom('SYMBOL_HAS_CLICK', true) );
@@ -53,23 +51,14 @@ cc.Class({
 
     },
 
-    firstClick(){
-        cc.log('this is first click');
-    },
-    secondClick(id){
-        if(id==this.symbolID){
-            
-        }else{
 
-        }
-        //cc.log('this is second click');
-    },
+
 
     hidenCover () {
         this.cover.active=false;
     },
     hidenSymbol() {
-        this.staticSymbol.active=false;
+        this.node.active=false;
     },
     getSymbolID() {
        // cc.log(this.symbolID);
@@ -81,7 +70,7 @@ cc.Class({
         //cc.log('change',num);
     },
     resetSymbol(){
-        this.staticSymbol.active=true;
+        //this.staticSymbol.active=true;
         this.cover.active=true;
     },
     changeToSymbol(symbolID) {
@@ -90,14 +79,5 @@ cc.Class({
         this.staticSymbol.getComponent(cc.Sprite).spriteFrame = asset;
 
     },
-    checkAccept(id){
-        if(this.symbolID==id){
-            this.hidenSymbol();
-        }else{
-            this.resetPrefab();
-        }
-    },
-
-  
 
 });
