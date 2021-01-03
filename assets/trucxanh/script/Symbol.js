@@ -23,14 +23,14 @@ cc.Class({
         this.node.setIndex = this.setIndex.bind(this);
         this.node.changeToSymbol = this.changeToSymbol.bind(this);
         this.node.resetSymbol = this.resetSymbol.bind(this);
-        this.node.hidenSymbol = this.hidenSymbol.bind(this);
-        this.node.hidenCover = this.hidenCover.bind(this);
+        this.node.hiddenSymbol = this.hiddenSymbol.bind(this);
+        this.node.hiddenCover = this.hiddenCover.bind(this);
        // this.resetSize();
         this.node.on("SETID",this.changeToSymbol,this);
         this.node.on("SET_INDEX",this.setIndex,this);
         this.node.on("RESET_SYMBOL",this.resetSymbol,this);
-        this.node.on("HIDEN_SYMBOL",this.hidenSymbol,this);
-        this.node.on("HIDEN_COVER",this.hidenCover,this);
+        this.node.on("HIDDEN_SYMBOL",this.hiddenSymbol,this);
+        this.node.on("HIDDEN_COVER",this.hiddenCover,this);
         
     },
     
@@ -48,17 +48,24 @@ cc.Class({
               index: this.index,
           });
       this.node.dispatchEvent(this.clickItemEvent);
-
+     
     },
+   
 
 
 
-
-    hidenCover () {
-        this.cover.active=false;
+    hiddenCover () {
+        this.node.runAction(cc.sequence(
+            cc.scaleTo(0.2, 0,1),
+            this.cover.active=false,
+            cc.scaleTo(0.2, 1, 1)
+        ));
+    
+       
+       
     },
-    hidenSymbol() {
-        this.node.active=false;
+    hiddenSymbol() {
+        this.node.destroy();
     },
     getSymbolID() {
        // cc.log(this.symbolID);

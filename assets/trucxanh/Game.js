@@ -1,41 +1,50 @@
-// Learn cc.Class:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/class.html
-//  - [English] http://docs.cocos2d-x.org/creator/manual/en/scripting/class.html
-// Learn Attribute:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/reference/attributes.html
-//  - [English] http://docs.cocos2d-x.org/creator/manual/en/scripting/reference/attributes.html
-// Learn life-cycle callbacks:
-//  - [Chinese] https://docs.cocos.com/creator/manual/zh/scripting/life-cycle-callbacks.html
-//  - [English] https://www.cocos2d-x.org/docs/creator/manual/en/scripting/life-cycle-callbacks.html
+
 
 cc.Class({
     extends: cc.Component,
 
     properties: {
-        // foo: {
-        //     // ATTRIBUTES:
-        //     default: null,        // The default value will be used only when the component attaching
-        //                           // to a node for the first time
-        //     type: cc.SpriteFrame, // optional, default is typeof default
-        //     serializable: true,   // optional, default is true
-        // },
-        // bar: {
-        //     get () {
-        //         return this._bar;
-        //     },
-        //     set (value) {
-        //         this._bar = value;
-        //     }
-        // },
+        scoreLabel: cc.Label,
+        winGamePanel: cc.Node,
+        tableGame: cc.Node,
     },
 
-    // LIFE-CYCLE CALLBACKS:
-
-    // onLoad () {},
-
-    start () {
-
+    onLoad() {
+       window.item = this;
+        this.score = 0;
+        this.node.on("ADD_SCORE", this.addScore, this);
+        this.node.on("GAME_WIN", this.winGame, this);
+        this.node.on("GAME_RESTART", this.restart, this);
+        this.hiddenWinGamePannel();
+        
     },
 
-    // update (dt) {},
+    addScore(ev) {
+        ev.stopPropagation();
+        this.score +=1;
+        this.scoreLabel.string = 'Score: '+this.score;
+    },
+
+    winGame(ev){
+        ev.stopPropagation();
+        this.showWinGamePanel();
+    },
+    showWinGamePanel(){
+        
+        this.winGamePanel.active=true;
+    },
+    hiddenWinGamePannel(){
+        this.winGamePanel.active=false;
+    },
+    loadGame(){
+        this.hiddenWinGamePannel();
+        this.tableGame.emit("LOAD_TABLE");
+    },
+    restart(ev){
+        ev.stopPropagation();
+        this.tableGame.emit("CLEAR_TABLE");
+        this.loadGame();
+        
+    },
+
 });
