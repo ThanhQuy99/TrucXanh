@@ -14,11 +14,10 @@ cc.Class({
 
     onLoad() {
 
-        window.item = this;
+        // window.item = this;
         this.totalScore = this.score;
         this.tableGame.active = false;
-        this.node.on("ADD_SCORE", this.addScore, this);
-        this.node.on("REMOVE_SCORE", this.removeScore, this);
+        this.node.on("UPDATE_SCORE", this.updateScore, this);
         this.node.on("GAME_WIN", this.winGame, this);
         this.node.on("GAME_RESTART", this.restart, this);
         this.hiddenWinGamePannel();
@@ -30,22 +29,30 @@ cc.Class({
         this.loadGame();
     },
 
-    addScore(ev) {
-        ev.stopPropagation();
-        this.totalScore += 10;
-        this.showScore();
-        //cc.log(this.score);
-    },
-    removeScore(ev) {
-        ev.stopPropagation();
-        this.totalScore -= 10;
-        this.showScore();
+    updateScore(ev) {
+        this.isUpdateScore=true;
+        const isCorrect = ev.getUserData().isCorrect;
+        if(isCorrect){
+            this.newScore = this.totalScore + 10;
+        }else{
+            this.newScore = this.totalScore - 10; 
+        } 
+        cc.tween(this)
+            .to(1, { totalScore: this.newScore }, { easing: "sineInOut" })
+            .call(() => {
+                this.isUpdateScore=false;
+            })
+            .start();
         this.checkFalse();
-        //cc.log(this.score);
+        ev.stopPropagation();
+
     },
+
+
     winGame(ev) {
         ev.stopPropagation();
         this.showWinGamePanel();
+        this.node.soundControl && this.node.soundControl.playMusicAudio();
     },
     showWinGamePanel() {
         this.tableGame.active = false;
@@ -59,16 +66,17 @@ cc.Class({
         this.falseGamePanel.active = false;
     },
     loadGame() {
+        this.node.soundControl && this.node.soundControl.stopMusicAudio();
         this.totalScore = this.score;
         this.tableGame.active = true;
         this.hiddenWinGamePannel();
         this.hiddenFalseGamePannel();
         this.tableGame.emit("LOAD_TABLE");
         this.showScore();
+        this.node.soundControl && this.node.soundControl.playMusicAudio();
     },
     restart(ev) {
         ev.stopPropagation();
-        // cc.log(this.score);
         this.totalScore = this.score;
         this.tableGame.active = true;
         this.tableGame.emit("CLEAR_TABLE");
@@ -76,14 +84,17 @@ cc.Class({
 
     },
     showScore() {
-        this.scoreLabel.string = 'Score: ' + this.totalScore;
+        this.scoreLabel.string = 'Score: ' + Math.round(this.totalScore);
     },
     checkFalse() {
-        if (this.totalScore == 0) {
-            //cc.log('false');
+        if (this.newScore == 0) {
             this.tableGame.active = false;
             this.falseGamePanel.active = true;
+            this.node.soundControl && this.node.soundControl.playMusicAudio();
         }
     },
+    update() {
+        if(this.isUpdateScore) this.showScore();
+    }
 
 });

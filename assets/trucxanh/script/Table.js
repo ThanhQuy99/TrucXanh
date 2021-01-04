@@ -15,9 +15,6 @@ cc.Class({
     onLoad() {
         // window.item = this;
         this.symbolSize = this.symbolSize + 10;
-        //this.loadTable();
-        this.node.loadTable = this.loadTable.bind(this);
-        this.node.clearGame = this.clearGame.bind(this);
         this.node.on("SYMBOL_HAS_CLICK", this.symbolClick, this);
         this.node.on("LOAD_TABLE", this.loadTable, this);
         this.node.on("CLEAR_TABLE", this.clearGame, this)
@@ -31,11 +28,8 @@ cc.Class({
         this.matrix = [];
         this.loadMatrix();
         this.symbols = [];
-        //cc.log(this.symbolSize*(this.colTotal-1));
         this.endX = this.starX + (this.symbolSize * (this.colTotal - 1));
         this.initSymbols();
-        this.node.on('SYMBOL_HAS_CLICK', (ev) => {
-        });
         this.resetListSymbol();
         this.scheduleOnce(this.moveListSymbol, 0.1 * this.symbols.length);
         this.scheduleOnce(() => { this.isCanClick = true }, 0.3 * this.symbols.length);
@@ -61,43 +55,40 @@ cc.Class({
     },
     moveListSymbol() {
         //  cc.log('move');
-
         this.x = this.starX;
         this.y = this.starY + this.symbolSize;
         for (let i = 0; i < this.symbols.length; i++) {
-
-            // this.moveSymBol(i,x,y)
-            //  cc.log(this.x,this.y);
-            this._moveSymBol = () => {
-                this.moveSymBol(i)
+            const symbol = this.symbols[i];
+            if (this.x < this.endX && i > 0) {
+                this.x += this.symbolSize;
+            } else {
+                this.x = this.starX;
+                this.y -= this.symbolSize;
             }
-            this.scheduleOnce(this._moveSymBol, 0.2 * i);
+            const pos = cc.v2(this.x, this.y);
+            symbol.runAction(cc.sequence(
+                cc.delayTime(0.2 * i),
+                cc.moveTo(0.2, pos).easing(cc.easeSineInOut()),
+            ))
         }
-        
-    },
-    moveSymBol(i) {
-        if (this.x < this.endX && i > 0) {
-            this.x += this.symbolSize;
-        } else {
-            this.x = this.starX;
-            this.y -= this.symbolSize;
-        }
-        this.symbols[i].runAction(cc.moveTo(0.2, this.x, this.y));
+
     },
 
     resetListSymbol() {
         // cc.log('move');
         for (let i = 0; i < this.symbols.length; i++) {
+            const symbol = this.symbols[i];
+
             this._resetSymbolInList = () => {
-                this.resetSymbolInList(i)
+                this.resetSymbolInList(symbol)
             }
             this.scheduleOnce(this._resetSymbolInList, 0.1 * i);
         }
 
     },
 
-    resetSymbolInList(i) {
-        this.symbols[i].emit("RESET_SYMBOL");
+    resetSymbolInList(symbol) {
+        symbol.emit("RESET_SYMBOL");
     },
 
     hiddenListSymbols() {
@@ -116,19 +107,19 @@ cc.Class({
             }
         }
 
-        this.shuffle(this.matrix);
+        // this.shuffle(this.matrix);
     },
     shuffle(array) {
         var currentIndex = array.length, temporaryValue, randomIndex;
 
-        // While there remain elements to shuffle...
+
         while (0 !== currentIndex) {
 
-            // Pick a remaining element...
+
             randomIndex = Math.floor(Math.random() * currentIndex);
             currentIndex -= 1;
 
-            // And swap it with the current element.
+
             temporaryValue = array[currentIndex];
             array[currentIndex] = array[randomIndex];
             array[randomIndex] = temporaryValue;
@@ -143,6 +134,8 @@ cc.Class({
         const symbol = ev.getUserData();
         if (!this.isCanClick) return;
         //cc.log(this.symbolFirstIndex);
+
+        this.node.dispatchEvent(new cc.Event.EventCustom('PLAY_SHOT_AUDIO', true));
         const { id, index } = symbol;
         if (!this.isFirstClick) {
             this.symbols[index - 1].emit("HIDDEN_COVER");
@@ -172,24 +165,24 @@ cc.Class({
             this.removeSymbol(this.symbols[index - 1].name);
             this.removeSymbol(this.symbols[this.symbolFirstIndex - 1].name);
             this.checkWin();
+            this.node.dispatchEvent(new cc.Event.EventCustom('PLAY_BREAK_AUDIO', true));
 
         } else {
             this.symbols[index - 1].emit("RESET_COVER");
             this.symbols[this.symbolFirstIndex - 1].emit("RESET_COVER");
             this.sentScore(false);
+            this.node.dispatchEvent(new cc.Event.EventCustom('PLAY_DEATH_AUDIO', true));
         }
         this.isCanClick = true;
     },
 
     sentScore(type) {
-        if (type) {
-            this.sentScoreEvent = new cc.Event.EventCustom('ADD_SCORE', true);
+       // cc.log(type);
+            this.sentScoreEvent = new cc.Event.EventCustom('UPDATE_SCORE', true);
+            this.sentScoreEvent.setUserData({
+                isCorrect: type,
+            });
             this.node.dispatchEvent(this.sentScoreEvent);
-        } else {
-            this.sentScoreEvent = new cc.Event.EventCustom('REMOVE_SCORE', true);
-            this.node.dispatchEvent(this.sentScoreEvent);
-        }
-
     },
     removeSymbol(symbolName) {
         let index = this.symbolsWins.indexOf(symbolName);
@@ -197,13 +190,11 @@ cc.Class({
     },
     checkWin() {
         if (this.symbolsWins.length == 0) {
-            //cc.log('win');
             this.node.dispatchEvent(new cc.Event.EventCustom('GAME_WIN', true));
         }
     },
     clearGame() {
         for (let i = 0; i < this.spawnCount; ++i) {
-            // cc.log(symbols);
             this.symbols[i].emit("DESTROY_SYMBOL");
         }
     }
