@@ -16,43 +16,60 @@ cc.Class({
         // window.item = this;
         this.symbolSize = this.symbolSize + 10;
         this.node.on("SYMBOL_HAS_CLICK", this.symbolClick, this);
-        this.node.on("LOAD_TABLE", this.loadTable, this);
-        this.node.on("CLEAR_TABLE", this.clearGame, this)
-
+        this.node.on("RESET_TABLE", this.resetTable, this);
+        this.loadTable();
     },
 
 
     loadTable() {
-
+        //! call once 
         this.isFirstClick = false;
         this.matrix = [];
-        this.loadMatrix();
+        this.shuffleMatrix();
         this.symbols = [];
         this.endX = this.starX + (this.symbolSize * (this.colTotal - 1));
         this.initSymbols();
-        this.resetListSymbol();
-        this.scheduleOnce(this.moveListSymbol, 0.1 * this.symbols.length);
-        this.scheduleOnce(() => { this.isCanClick = true }, 0.3 * this.symbols.length);
-
-
+      
     },
 
     initSymbols() {
-
+         //! call once 
         for (let i = 0; i < this.spawnCount; ++i) {
             let item = cc.instantiate(this.symbolPrefab);
-
             this.symbols.push(item);
             this.table.addChild(item, i, 'Symbol' + i);
             item.emit("SET_INDEX", i + 1);
             item.emit("SETID", this.matrix[i]);
             item.emit("HIDDEN_SYMBOL");
+            
         }
         this.symbolsWins = this.symbols.slice();
         this.isCanClick = false;
+    },
 
+    resetTable(){
+       
+        // todo 
+        // shuffer
+        this.shuffleMatrix();
+        // reset symbols data: id ( texture )
+        for (let i = 0; i < this.spawnCount; ++i) {
+            const symbol = this.symbols[i];
+            symbol.emit("SETID", this.matrix[i]);
+            symbol.emit("HIDDEN_SYMBOL");
+            symbol.emit("RESET_COVER");
+        }
+        this.resetListSymbol();
+        //this.moveListSymbol();
+        this.scheduleOnce(this.moveListSymbol, 0.1 * this.symbols.length);
+        this.scheduleOnce(() => { this.isCanClick = true }, 0.3 * this.symbols.length);
+        // active
+
+        // event : can click again
 
     },
+
+
     moveListSymbol() {
         //  cc.log('move');
         this.x = this.starX;
@@ -75,21 +92,13 @@ cc.Class({
     },
 
     resetListSymbol() {
-        // cc.log('move');
         for (let i = 0; i < this.symbols.length; i++) {
             const symbol = this.symbols[i];
-
-            this._resetSymbolInList = () => {
-                this.resetSymbolInList(symbol)
-            }
-            this.scheduleOnce(this._resetSymbolInList, 0.1 * i);
+            symbol.emit("RESET_SYMBOL", i);
         }
 
     },
 
-    resetSymbolInList(symbol) {
-        symbol.emit("RESET_SYMBOL");
-    },
 
     hiddenListSymbols() {
         for (let i = 0; i < this.symbols.length; i++) {
@@ -98,7 +107,7 @@ cc.Class({
     },
 
 
-    loadMatrix() {
+    shuffleMatrix() {
         for (let i = 0; i < this.spawnCount; i++) {
             if (i < this.spawnCount / 2) {
                 this.matrix[i] = i + 1;
@@ -106,26 +115,16 @@ cc.Class({
                 this.matrix[i] = (i - 9);
             }
         }
-
          this.shuffle(this.matrix);
     },
+
     shuffle(array) {
-        var currentIndex = array.length, temporaryValue, randomIndex;
-
-
-        while (0 !== currentIndex) {
-
-
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-
-
-            temporaryValue = array[currentIndex];
-            array[currentIndex] = array[randomIndex];
-            array[randomIndex] = temporaryValue;
+        for (let i = array.length - 1; i > 0; i--) {
+            let j = Math.floor(Math.random() * (i + 1));
+            let temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
         }
-
-        return array;
     },
 
 
@@ -159,8 +158,8 @@ cc.Class({
 
     compare(id, index) {
         if (id == this.symbolFirstID) {
-            this.symbols[index - 1].emit("DESTROY_SYMBOL");
-            this.symbols[this.symbolFirstIndex - 1].emit("DESTROY_SYMBOL");
+            this.symbols[index - 1].emit("HIDDEN_SYMBOL");
+            this.symbols[this.symbolFirstIndex - 1].emit("HIDDEN_SYMBOL");
             this.sentScore(true);
             this.removeSymbol(this.symbols[index - 1].name);
             this.removeSymbol(this.symbols[this.symbolFirstIndex - 1].name);
@@ -193,10 +192,5 @@ cc.Class({
             this.node.dispatchEvent(new cc.Event.EventCustom('GAME_WIN', true));
         }
     },
-    clearGame() {
-        for (let i = 0; i < this.spawnCount; ++i) {
-            this.symbols[i].emit("DESTROY_SYMBOL");
-        }
-    }
 
 });

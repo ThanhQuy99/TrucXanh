@@ -26,6 +26,7 @@ cc.Class({
         this.node.on("DESTROY_SYMBOL",this.destroySymbol,this);
         this.node.on("HIDDEN_COVER",this.flipShow,this);
         this.node.on("RESET_COVER",this.flipHide,this);
+        this.node.on("RESET_COVER",this.flipHide,this);
         
     },
     
@@ -39,8 +40,6 @@ cc.Class({
      
     },
    
-
-
 
     flipShow () {
         this.node.runAction(cc.sequence(
@@ -76,9 +75,20 @@ cc.Class({
         this.lable.string=num;
         this.index=num;
     },
-    resetSymbol(){
+    resetSymbol(i){
+        // const delay = i * 0.1;
+        // this.node.runAction(cc.sequence(
+        //     cc.delayTime(delay),
+        //     cc.scaleTo(0.5, 1.5),
+        //     cc.fadeOut(0.5),
+        //     cc.callFunc(()=>{
+        //         this.node.active=true;
+        //     }),
+        // ));
         this.node.active=true;
     },
+
+
     changeToSymbol(symbolID) {
         const asset = this.symbols[symbolID];
         this.symbolID=symbolID;

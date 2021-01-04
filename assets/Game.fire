@@ -1082,7 +1082,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "FalseGame",
+    "_name": "\bLoseGame",
     "_objFlags": 0,
     "_parent": {
       "__id__": 5
@@ -1794,7 +1794,7 @@
     "winGamePanel": {
       "__id__": 12
     },
-    "falseGamePanel": {
+    "loseGamePanel": {
       "__id__": 24
     },
     "tableGame": {

@@ -6,7 +6,7 @@ cc.Class({
     properties: {
         scoreLabel: cc.Label,
         winGamePanel: cc.Node,
-        falseGamePanel: cc.Node,
+        loseGamePanel: cc.Node,
         tableGame: cc.Node,
         score: 0,
         startButton: cc.Node,
@@ -26,7 +26,7 @@ cc.Class({
     },
     playGame() {
         this.startButton.active = false;
-        this.loadGame();
+        this.setNewGame();
     },
 
     updateScore(ev) {
@@ -43,7 +43,7 @@ cc.Class({
                 this.isUpdateScore=false;
             })
             .start();
-        this.checkFalse();
+        this.checkLose();
         ev.stopPropagation();
 
     },
@@ -62,16 +62,16 @@ cc.Class({
     hiddenWinGamePannel() {
         this.winGamePanel.active = false;
     },
-    hiddenFalseGamePannel() {
-        this.falseGamePanel.active = false;
+    hiddenLoseGamePannel() {
+        this.loseGamePanel.active = false;
     },
-    loadGame() {
+    setNewGame() {
         this.node.soundControl && this.node.soundControl.stopMusicAudio();
         this.totalScore = this.score;
         this.tableGame.active = true;
         this.hiddenWinGamePannel();
-        this.hiddenFalseGamePannel();
-        this.tableGame.emit("LOAD_TABLE");
+        this.hiddenLoseGamePannel();
+        this.tableGame.emit("RESET_TABLE");
         this.showScore();
         this.node.soundControl && this.node.soundControl.playMusicAudio();
     },
@@ -79,17 +79,21 @@ cc.Class({
         ev.stopPropagation();
         this.totalScore = this.score;
         this.tableGame.active = true;
-        this.tableGame.emit("CLEAR_TABLE");
-        this.loadGame();
+        this.setNewGame();
+
+        // todo
+        // reset table
+        // reset score
+        // reset effect win
 
     },
     showScore() {
         this.scoreLabel.string = 'Score: ' + Math.round(this.totalScore);
     },
-    checkFalse() {
+    checkLose() {
         if (this.newScore == 0) {
             this.tableGame.active = false;
-            this.falseGamePanel.active = true;
+            this.loseGamePanel.active = true;
             this.node.soundControl && this.node.soundControl.playMusicAudio();
         }
     },
