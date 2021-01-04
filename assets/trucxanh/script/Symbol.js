@@ -24,13 +24,17 @@ cc.Class({
         this.node.changeToSymbol = this.changeToSymbol.bind(this);
         this.node.resetSymbol = this.resetSymbol.bind(this);
         this.node.hiddenSymbol = this.hiddenSymbol.bind(this);
+        this.node.destroySymbol = this.destroySymbol.bind(this);
         this.node.hiddenCover = this.hiddenCover.bind(this);
+        this.node.resetCover = this.resetCover.bind(this);
        // this.resetSize();
         this.node.on("SETID",this.changeToSymbol,this);
         this.node.on("SET_INDEX",this.setIndex,this);
         this.node.on("RESET_SYMBOL",this.resetSymbol,this);
         this.node.on("HIDDEN_SYMBOL",this.hiddenSymbol,this);
+        this.node.on("DESTROY_SYMBOL",this.destroySymbol,this);
         this.node.on("HIDDEN_COVER",this.hiddenCover,this);
+        this.node.on("RESET_COVER",this.resetCover,this);
         
     },
     
@@ -59,12 +63,12 @@ cc.Class({
             cc.scaleTo(0.2, 0,1),
             this.cover.active=false,
             cc.scaleTo(0.2, 1, 1)
-        ));
-    
-       
-       
+        ));       
     },
     hiddenSymbol() {
+        this.node.active=false;
+    },
+    destroySymbol() {
         this.node.destroy();
     },
     getSymbolID() {
@@ -78,6 +82,13 @@ cc.Class({
     },
     resetSymbol(){
         //this.staticSymbol.active=true;
+        this.node.active=true;
+    },
+    resetCover(){
+        this.node.runAction(cc.sequence(
+            cc.scaleTo(0.2, 0,1),  
+            cc.scaleTo(0.2, 1, 1)
+        ));  
         this.cover.active=true;
     },
     changeToSymbol(symbolID) {

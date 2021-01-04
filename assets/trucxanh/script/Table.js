@@ -13,64 +13,99 @@ cc.Class({
     },
 
     onLoad() {
-       // window.item = this;
-        this.loadTable();
+        // window.item = this;
+        this.symbolSize = this.symbolSize + 10;
+        //this.loadTable();
         this.node.loadTable = this.loadTable.bind(this);
         this.node.clearGame = this.clearGame.bind(this);
         this.node.on("SYMBOL_HAS_CLICK", this.symbolClick, this);
         this.node.on("LOAD_TABLE", this.loadTable, this);
-        this.node.on("CLEAR_TABLE",this.clearGame,this)
+        this.node.on("CLEAR_TABLE", this.clearGame, this)
 
     },
-    
 
-    loadTable(){
+
+    loadTable() {
+
         this.isFirstClick = false;
         this.matrix = [];
         this.loadMatrix();
         this.symbols = [];
-        
-        this.symbolSize = this.symbolSize + 10;
         //cc.log(this.symbolSize*(this.colTotal-1));
         this.endX = this.starX + (this.symbolSize * (this.colTotal - 1));
         this.initSymbols();
-        
-        this.node.on('SYMBOL_HAS_CLICK', (ev) =>{
-
+        this.node.on('SYMBOL_HAS_CLICK', (ev) => {
         });
+        this.resetListSymbol();
+        this.scheduleOnce(this.moveListSymbol, 0.1 * this.symbols.length);
+        this.scheduleOnce(() => { this.isCanClick = true }, 0.3 * this.symbols.length);
+
+
     },
 
     initSymbols() {
-       
-        let x = this.starX;
-        let y = this.starY + this.symbolSize;
+
         for (let i = 0; i < this.spawnCount; ++i) {
-            
-            if (x < this.endX && i > 0) {
-                x += this.symbolSize;
-            } else {
-                x = this.starX;
-                y -= this.symbolSize;
-            }
             let item = cc.instantiate(this.symbolPrefab);
-           // item.setPosition(cc.v2(x, y));    
-            item.runAction(cc.moveTo(3, x,y));
 
             this.symbols.push(item);
             this.table.addChild(item, i, 'Symbol' + i);
             item.emit("SET_INDEX", i + 1);
             item.emit("SETID", this.matrix[i]);
-
-
+            item.emit("HIDDEN_SYMBOL");
         }
-       
-        this.symbolsWins=this.symbols.slice();
-        this.isCanClick = true;
-    },
+        this.symbolsWins = this.symbols.slice();
+        this.isCanClick = false;
 
-    compare2(){
 
     },
+    moveListSymbol() {
+        //  cc.log('move');
+
+        this.x = this.starX;
+        this.y = this.starY + this.symbolSize;
+        for (let i = 0; i < this.symbols.length; i++) {
+
+            // this.moveSymBol(i,x,y)
+            //  cc.log(this.x,this.y);
+            this._moveSymBol = () => {
+                this.moveSymBol(i)
+            }
+            this.scheduleOnce(this._moveSymBol, 0.2 * i);
+        }
+        
+    },
+    moveSymBol(i) {
+        if (this.x < this.endX && i > 0) {
+            this.x += this.symbolSize;
+        } else {
+            this.x = this.starX;
+            this.y -= this.symbolSize;
+        }
+        this.symbols[i].runAction(cc.moveTo(0.2, this.x, this.y));
+    },
+
+    resetListSymbol() {
+        // cc.log('move');
+        for (let i = 0; i < this.symbols.length; i++) {
+            this._resetSymbolInList = () => {
+                this.resetSymbolInList(i)
+            }
+            this.scheduleOnce(this._resetSymbolInList, 0.1 * i);
+        }
+
+    },
+
+    resetSymbolInList(i) {
+        this.symbols[i].emit("RESET_SYMBOL");
+    },
+
+    hiddenListSymbols() {
+        for (let i = 0; i < this.symbols.length; i++) {
+            this.symbols[i].emit("HIDDEN_SYMBOL");
+        }
+    },
+
 
     loadMatrix() {
         for (let i = 0; i < this.spawnCount; i++) {
@@ -123,7 +158,7 @@ cc.Class({
             }
             this.scheduleOnce(this._callback, this.delayTime);
             this.isFirstClick = false;
- 
+
         } else {
             this.isFirstClick = true;
         }
@@ -131,39 +166,45 @@ cc.Class({
 
     compare(id, index) {
         if (id == this.symbolFirstID) {
-            this.symbols[index - 1].emit("HIDDEN_SYMBOL");
-            this.symbols[this.symbolFirstIndex - 1].emit("HIDDEN_SYMBOL");
-            this.sentScore();
+            this.symbols[index - 1].emit("DESTROY_SYMBOL");
+            this.symbols[this.symbolFirstIndex - 1].emit("DESTROY_SYMBOL");
+            this.sentScore(true);
             this.removeSymbol(this.symbols[index - 1].name);
             this.removeSymbol(this.symbols[this.symbolFirstIndex - 1].name);
-            this.checkWin();            
-            
+            this.checkWin();
+
         } else {
-            this.symbols[index - 1].emit("RESET_SYMBOL");
-            this.symbols[this.symbolFirstIndex - 1].emit("RESET_SYMBOL");
+            this.symbols[index - 1].emit("RESET_COVER");
+            this.symbols[this.symbolFirstIndex - 1].emit("RESET_COVER");
+            this.sentScore(false);
         }
         this.isCanClick = true;
     },
 
-    sentScore(){
-        this.sentScoreEvent = new cc.Event.EventCustom('ADD_SCORE', true);
-        this.node.dispatchEvent(this.sentScoreEvent);
+    sentScore(type) {
+        if (type) {
+            this.sentScoreEvent = new cc.Event.EventCustom('ADD_SCORE', true);
+            this.node.dispatchEvent(this.sentScoreEvent);
+        } else {
+            this.sentScoreEvent = new cc.Event.EventCustom('REMOVE_SCORE', true);
+            this.node.dispatchEvent(this.sentScoreEvent);
+        }
+
     },
-    removeSymbol(symbolName){
-        let index=this.symbolsWins.indexOf(symbolName);
-        this.symbolsWins.splice(index,1);
+    removeSymbol(symbolName) {
+        let index = this.symbolsWins.indexOf(symbolName);
+        this.symbolsWins.splice(index, 1);
     },
-    checkWin(){
-        if(this.symbolsWins.length==0){
+    checkWin() {
+        if (this.symbolsWins.length == 0) {
             //cc.log('win');
             this.node.dispatchEvent(new cc.Event.EventCustom('GAME_WIN', true));
         }
     },
-    clearGame(){
+    clearGame() {
         for (let i = 0; i < this.spawnCount; ++i) {
             // cc.log(symbols);
-            this.symbols[i].emit("HIDDEN_SYMBOL");
-           
+            this.symbols[i].emit("DESTROY_SYMBOL");
         }
     }
 
