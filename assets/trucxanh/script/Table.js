@@ -107,7 +107,7 @@ cc.Class({
             }
         }
 
-        // this.shuffle(this.matrix);
+         this.shuffle(this.matrix);
     },
     shuffle(array) {
         var currentIndex = array.length, temporaryValue, randomIndex;
