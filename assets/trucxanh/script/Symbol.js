@@ -5,93 +5,100 @@ cc.Class({
 
     properties: {
         staticSymbol: cc.Node,
-        lable: cc.Label,
+        label: cc.Label,
         cover: cc.Node,
         symbols: {
             default: [],
             type: cc.SpriteFrame,
-        }, 
-        
+        },
+
 
     },
-    
 
-    onLoad () {
-        this.index=0;
 
-        this.node.on("SETID",this.changeToSymbol,this);
-        this.node.on("SET_INDEX",this.setIndex,this);
-        this.node.on("RESET_SYMBOL",this.resetSymbol,this);
-        this.node.on("HIDDEN_SYMBOL",this.hiddenSymbol,this);
-        this.node.on("DESTROY_SYMBOL",this.destroySymbol,this);
-        this.node.on("HIDDEN_COVER",this.flipShow,this);
-        this.node.on("RESET_COVER",this.flipHide,this);
-        this.node.on("RESET_COVER",this.flipHide,this);
-        
+    onLoad() {
+        this.index = 0;
+
+        this.node.on("SET_ID", this.changeToSymbol, this);
+        this.node.on("SET_INDEX", this.setIndex, this);
+        this.node.on("RESET_SYMBOL", this.resetSymbol, this);
+        this.node.on("HIDDEN_SYMBOL", this.hiddenSymbol, this);
+        this.node.on("DISABLED_SYMBOL", this.disabledSymbol, this);
+        this.node.on("ENABLED_SYMBOL", this.enabledSymbol, this);
+        this.node.on("HIDDEN_COVER", this.flipShow, this);
+        this.node.on("RESET_COVER", this.flipHide, this);
+        this.node.on("SHOW_COVER", this.showCover, this);
+
     },
-    
-    onClick(evt,index){
-      this.clickItemEvent = new cc.Event.EventCustom('SYMBOL_HAS_CLICK', true);
-      this.clickItemEvent.setUserData({
-              id: this.symbolID,
-              index: this.index,
-          });
-      this.node.dispatchEvent(this.clickItemEvent);
-     
-    },
-   
 
-    flipShow () {
+    onClick(evt, index) {
+        this.clickItemEvent = new cc.Event.EventCustom('SYMBOL_HAS_CLICK', true);
+        this.clickItemEvent.setUserData({
+            id: this.symbolID,
+            index: this.index,
+        });
+        this.node.dispatchEvent(this.clickItemEvent);
+
+    },
+
+
+    flipShow() {
         this.node.runAction(cc.sequence(
-            cc.scaleTo(0.2, 0,1),
-            cc.callFunc(()=>{
-                this.cover.active=false;
+            cc.scaleTo(0.2, 0, 1),
+            cc.callFunc(() => {
+                this.cover.active = false;
             }),
             cc.scaleTo(0.2, 1, 1)
-        ));     
-         
+        ));
+
     },
 
 
-    flipHide(){
+    flipHide() {
         this.node.runAction(cc.sequence(
-            cc.scaleTo(0.2, 0,1),
-            cc.callFunc(()=>{
-                this.cover.active=true;
+            cc.scaleTo(0.2, 0, 1),
+            cc.callFunc(() => {
+                this.cover.active = true;
             }),
             cc.scaleTo(0.2, 1, 1)
-        ));     
+        ));
+    },
+    showCover() {
+        this.cover.active = true;
     },
     hiddenSymbol() {
-        this.node.active=false;
+        this.node.opacity = 0;
     },
-    destroySymbol() {
-        this.node.destroy();
+
+    disabledSymbol() {
+        this.node.active = false;
     },
+    enabledSymbol() {
+        this.node.active = true;
+    },
+
     getSymbolID() {
         return this.symbolID;
     },
-    setIndex(num){
-        this.lable.string=num;
-        this.index=num;
+    setIndex(num) {
+        this.label.string = num;
+        this.index = num;
     },
-    resetSymbol(i){
-        // const delay = i * 0.1;
-        // this.node.runAction(cc.sequence(
-        //     cc.delayTime(delay),
-        //     cc.scaleTo(0.5, 1.5),
-        //     cc.fadeOut(0.5),
-        //     cc.callFunc(()=>{
-        //         this.node.active=true;
-        //     }),
-        // ));
-        this.node.active=true;
+    resetSymbol(i) {
+        const delay = i * 0.1;
+        this.node.runAction(cc.sequence(
+            cc.delayTime(delay),
+            cc.callFunc(() => {
+                this.node.opacity = 255;
+            }),
+        ));
+
     },
 
 
     changeToSymbol(symbolID) {
         const asset = this.symbols[symbolID];
-        this.symbolID=symbolID;
+        this.symbolID = symbolID;
         this.staticSymbol.getComponent(cc.Sprite).spriteFrame = asset;
 
     },

@@ -39,7 +39,7 @@ cc.Class({
             this.symbols.push(item);
             this.table.addChild(item, i, 'Symbol' + i);
             item.emit("SET_INDEX", i + 1);
-            item.emit("SETID", this.matrix[i]);
+            item.emit("SET_ID", this.matrix[i]);
             item.emit("HIDDEN_SYMBOL");
             
         }
@@ -50,28 +50,32 @@ cc.Class({
     resetTable(){
        
         // todo 
-        // shuffer
+        // shuffler
+        this.symbolsWins = this.symbols.slice();
         this.shuffleMatrix();
+        this.hiddenListSymbols();
+        this.isCanClick = false;
         // reset symbols data: id ( texture )
         for (let i = 0; i < this.spawnCount; ++i) {
             const symbol = this.symbols[i];
-            symbol.emit("SETID", this.matrix[i]);
-            symbol.emit("HIDDEN_SYMBOL");
-            symbol.emit("RESET_COVER");
+            symbol.emit("SET_ID", this.matrix[i]);
+            symbol.setPosition(0, 0);
+            symbol.emit("SHOW_COVER");
         }
         this.resetListSymbol();
-        //this.moveListSymbol();
-        this.scheduleOnce(this.moveListSymbol, 0.1 * this.symbols.length);
-        this.scheduleOnce(() => { this.isCanClick = true }, 0.3 * this.symbols.length);
-        // active
-
-        // event : can click again
-
+        this.node.runAction(cc.sequence(
+            cc.delayTime(0.1 * this.symbols.length),
+            cc.callFunc(() => {
+                this.moveListSymbol();
+            }),
+            cc.delayTime(0.2 * this.symbols.length),
+            cc.callFunc(() => {
+                this.isCanClick = true;
+            }),
+        ))
     },
 
-
     moveListSymbol() {
-        //  cc.log('move');
         this.x = this.starX;
         this.y = this.starY + this.symbolSize;
         for (let i = 0; i < this.symbols.length; i++) {
@@ -82,24 +86,23 @@ cc.Class({
                 this.x = this.starX;
                 this.y -= this.symbolSize;
             }
+
+            
             const pos = cc.v2(this.x, this.y);
             symbol.runAction(cc.sequence(
                 cc.delayTime(0.2 * i),
                 cc.moveTo(0.2, pos).easing(cc.easeSineInOut()),
             ))
         }
-
     },
 
     resetListSymbol() {
         for (let i = 0; i < this.symbols.length; i++) {
             const symbol = this.symbols[i];
+            symbol.emit("ENABLED_SYMBOL");
             symbol.emit("RESET_SYMBOL", i);
         }
-
     },
-
-
     hiddenListSymbols() {
         for (let i = 0; i < this.symbols.length; i++) {
             this.symbols[i].emit("HIDDEN_SYMBOL");
@@ -115,7 +118,7 @@ cc.Class({
                 this.matrix[i] = (i - 9);
             }
         }
-         this.shuffle(this.matrix);
+         //this.shuffle(this.matrix);
     },
 
     shuffle(array) {
@@ -158,8 +161,8 @@ cc.Class({
 
     compare(id, index) {
         if (id == this.symbolFirstID) {
-            this.symbols[index - 1].emit("HIDDEN_SYMBOL");
-            this.symbols[this.symbolFirstIndex - 1].emit("HIDDEN_SYMBOL");
+            this.symbols[index - 1].emit("DISABLED_SYMBOL");
+            this.symbols[this.symbolFirstIndex - 1].emit("DISABLED_SYMBOL");
             this.sentScore(true);
             this.removeSymbol(this.symbols[index - 1].name);
             this.removeSymbol(this.symbols[this.symbolFirstIndex - 1].name);

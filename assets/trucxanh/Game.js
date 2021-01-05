@@ -20,7 +20,7 @@ cc.Class({
         this.node.on("UPDATE_SCORE", this.updateScore, this);
         this.node.on("GAME_WIN", this.winGame, this);
         this.node.on("GAME_RESTART", this.restart, this);
-        this.hiddenWinGamePannel();
+        this.hiddenWinGamePanel();
         this.showScore();
 
     },
@@ -59,18 +59,18 @@ cc.Class({
         this.winGamePanel.active = true;
 
     },
-    hiddenWinGamePannel() {
+    hiddenWinGamePanel() {
         this.winGamePanel.active = false;
     },
-    hiddenLoseGamePannel() {
+    hiddenLoseGamePanel() {
         this.loseGamePanel.active = false;
     },
     setNewGame() {
         this.node.soundControl && this.node.soundControl.stopMusicAudio();
         this.totalScore = this.score;
         this.tableGame.active = true;
-        this.hiddenWinGamePannel();
-        this.hiddenLoseGamePannel();
+        this.hiddenWinGamePanel();
+        this.hiddenLoseGamePanel();
         this.tableGame.emit("RESET_TABLE");
         this.showScore();
         this.node.soundControl && this.node.soundControl.playMusicAudio();
