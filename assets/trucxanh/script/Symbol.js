@@ -94,8 +94,6 @@ cc.Class({
         ));
 
     },
-
-
     changeToSymbol(symbolID) {
         const asset = this.symbols[symbolID];
         this.symbolID = symbolID;

@@ -14,7 +14,7 @@ cc.Class({
 
     onLoad() {
 
-        // window.item = this;
+        //window.item = this;
         this.totalScore = this.score;
         this.tableGame.active = false;
         this.node.on("UPDATE_SCORE", this.updateScore, this);
@@ -30,17 +30,17 @@ cc.Class({
     },
 
     updateScore(ev) {
-        this.isUpdateScore=true;
+        this.isUpdateScore = true;
         const isCorrect = ev.getUserData().isCorrect;
-        if(isCorrect){
+        if (isCorrect) {
             this.newScore = this.totalScore + 10;
-        }else{
-            this.newScore = this.totalScore - 10; 
-        } 
+        } else {
+            this.newScore = this.totalScore - 10;
+        }
         cc.tween(this)
             .to(1, { totalScore: this.newScore }, { easing: "sineInOut" })
             .call(() => {
-                this.isUpdateScore=false;
+                this.isUpdateScore = false;
             })
             .start();
         this.checkLose();
@@ -79,13 +79,11 @@ cc.Class({
         ev.stopPropagation();
         this.totalScore = this.score;
         this.tableGame.active = true;
-        this.setNewGame();
-
         // todo
         // reset table
         // reset score
         // reset effect win
-
+        this.setNewGame();
     },
     showScore() {
         this.scoreLabel.string = 'Score: ' + Math.round(this.totalScore);
@@ -98,7 +96,7 @@ cc.Class({
         }
     },
     update() {
-        if(this.isUpdateScore) this.showScore();
-    }
+        if (this.isUpdateScore) this.showScore();
+    },
 
 });

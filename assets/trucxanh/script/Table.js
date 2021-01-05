@@ -10,10 +10,11 @@ cc.Class({
         starY: 0,
         colTotal: 0,
         delayTime: 0,
+        numberOfCol: 0,
     },
 
     onLoad() {
-        // window.item = this;
+        window.item = this;
         this.symbolSize = this.symbolSize + 10;
         this.node.on("SYMBOL_HAS_CLICK", this.symbolClick, this);
         this.node.on("RESET_TABLE", this.resetTable, this);
@@ -29,11 +30,11 @@ cc.Class({
         this.symbols = [];
         this.endX = this.starX + (this.symbolSize * (this.colTotal - 1));
         this.initSymbols();
-      
+
     },
 
     initSymbols() {
-         //! call once 
+        //! call once 
         for (let i = 0; i < this.spawnCount; ++i) {
             let item = cc.instantiate(this.symbolPrefab);
             this.symbols.push(item);
@@ -41,14 +42,14 @@ cc.Class({
             item.emit("SET_INDEX", i + 1);
             item.emit("SET_ID", this.matrix[i]);
             item.emit("HIDDEN_SYMBOL");
-            
+
         }
         this.symbolsWins = this.symbols.slice();
         this.isCanClick = false;
     },
 
-    resetTable(){
-       
+    resetTable() {
+
         // todo 
         // shuffler
         this.symbolsWins = this.symbols.slice();
@@ -76,19 +77,17 @@ cc.Class({
     },
 
     moveListSymbol() {
-        this.x = this.starX;
-        this.y = this.starY + this.symbolSize;
         for (let i = 0; i < this.symbols.length; i++) {
             const symbol = this.symbols[i];
-            if (this.x < this.endX && i > 0) {
-                this.x += this.symbolSize;
-            } else {
-                this.x = this.starX;
-                this.y -= this.symbolSize;
-            }
 
-            
-            const pos = cc.v2(this.x, this.y);
+
+            const col = i % this.numberOfCol;
+            const row = Math.floor(i / this.numberOfCol)
+
+            const x = this.starX + (col * this.symbolSize);
+            const y = this.starY - (row * this.symbolSize);
+
+            const pos = cc.v2(x, y);
             symbol.runAction(cc.sequence(
                 cc.delayTime(0.2 * i),
                 cc.moveTo(0.2, pos).easing(cc.easeSineInOut()),
@@ -118,7 +117,7 @@ cc.Class({
                 this.matrix[i] = (i - 9);
             }
         }
-         //this.shuffle(this.matrix);
+        //this.shuffle(this.matrix);
     },
 
     shuffle(array) {
@@ -179,12 +178,12 @@ cc.Class({
     },
 
     sentScore(type) {
-       // cc.log(type);
-            this.sentScoreEvent = new cc.Event.EventCustom('UPDATE_SCORE', true);
-            this.sentScoreEvent.setUserData({
-                isCorrect: type,
-            });
-            this.node.dispatchEvent(this.sentScoreEvent);
+        // cc.log(type);
+        this.sentScoreEvent = new cc.Event.EventCustom('UPDATE_SCORE', true);
+        this.sentScoreEvent.setUserData({
+            isCorrect: type,
+        });
+        this.node.dispatchEvent(this.sentScoreEvent);
     },
     removeSymbol(symbolName) {
         let index = this.symbolsWins.indexOf(symbolName);
@@ -195,5 +194,6 @@ cc.Class({
             this.node.dispatchEvent(new cc.Event.EventCustom('GAME_WIN', true));
         }
     },
+
 
 });

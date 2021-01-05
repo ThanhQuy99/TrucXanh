@@ -551,6 +551,7 @@
     "starY": 170,
     "colTotal": 5,
     "delayTime": 1,
+    "numberOfCol": 5,
     "_id": "b8b/RX/gdAPYPpr/KGAkEa"
   },
   {
@@ -1800,7 +1801,7 @@
     "tableGame": {
       "__id__": 8
     },
-    "score": 20,
+    "score": 100,
     "startButton": {
       "__id__": 36
     },
