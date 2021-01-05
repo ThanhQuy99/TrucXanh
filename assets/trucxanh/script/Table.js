@@ -6,15 +6,16 @@ cc.Class({
         symbolPrefab: cc.Prefab,
         spawnCount: 0,
         symbolSize: 0,
-        starX: 0,
-        starY: 0,
-        colTotal: 0,
         delayTime: 0,
         numberOfCol: 0,
+        numberOfRow: 0,
     },
 
     onLoad() {
         window.item = this;
+
+        this.startX = this.table.x - (this.numberOfCol / 2) * this.symbolSize;
+        this.startY = this.table.y + (this.numberOfRow / 2) * this.symbolSize;
         this.symbolSize = this.symbolSize + 10;
         this.node.on("SYMBOL_HAS_CLICK", this.symbolClick, this);
         this.node.on("RESET_TABLE", this.resetTable, this);
@@ -28,7 +29,6 @@ cc.Class({
         this.matrix = [];
         this.shuffleMatrix();
         this.symbols = [];
-        this.endX = this.starX + (this.symbolSize * (this.colTotal - 1));
         this.initSymbols();
 
     },
@@ -80,12 +80,12 @@ cc.Class({
         for (let i = 0; i < this.symbols.length; i++) {
             const symbol = this.symbols[i];
 
-
             const col = i % this.numberOfCol;
             const row = Math.floor(i / this.numberOfCol)
 
-            const x = this.starX + (col * this.symbolSize);
-            const y = this.starY - (row * this.symbolSize);
+
+            const x = this.startX + (col * this.symbolSize);
+            const y = this.startY - (row * this.symbolSize);
 
             const pos = cc.v2(x, y);
             symbol.runAction(cc.sequence(
@@ -117,7 +117,7 @@ cc.Class({
                 this.matrix[i] = (i - 9);
             }
         }
-        //this.shuffle(this.matrix);
+        this.shuffle(this.matrix);
     },
 
     shuffle(array) {
@@ -134,8 +134,6 @@ cc.Class({
         ev.stopPropagation();
         const symbol = ev.getUserData();
         if (!this.isCanClick) return;
-        //cc.log(this.symbolFirstIndex);
-
         this.node.dispatchEvent(new cc.Event.EventCustom('PLAY_SHOT_AUDIO', true));
         const { id, index } = symbol;
         if (!this.isFirstClick) {
@@ -178,7 +176,6 @@ cc.Class({
     },
 
     sentScore(type) {
-        // cc.log(type);
         this.sentScoreEvent = new cc.Event.EventCustom('UPDATE_SCORE', true);
         this.sentScoreEvent.setUserData({
             isCorrect: type,
@@ -194,6 +191,4 @@ cc.Class({
             this.node.dispatchEvent(new cc.Event.EventCustom('GAME_WIN', true));
         }
     },
-
-
 });

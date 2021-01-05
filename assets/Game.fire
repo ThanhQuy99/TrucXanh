@@ -547,11 +547,9 @@
     },
     "spawnCount": 20,
     "symbolSize": 100,
-    "starX": -200,
-    "starY": 170,
-    "colTotal": 5,
     "delayTime": 1,
     "numberOfCol": 5,
+    "numberOfRow": 4,
     "_id": "b8b/RX/gdAPYPpr/KGAkEa"
   },
   {
