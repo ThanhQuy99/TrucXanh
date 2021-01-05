@@ -459,15 +459,15 @@
     "_opacity": 255,
     "_color": {
       "__type__": "cc.Color",
-      "r": 250,
-      "g": 246,
-      "b": 246,
+      "r": 255,
+      "g": 255,
+      "b": 255,
       "a": 255
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 800,
-      "height": 640
+      "width": 0,
+      "height": 0
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -499,37 +499,36 @@
     "_id": "c31xsz9FdJ4ay+sYS6qk9Q"
   },
   {
-    "__type__": "cc.Layout",
+    "__type__": "cc.Sprite",
     "_name": "",
     "_objFlags": 0,
     "node": {
       "__id__": 9
     },
     "_enabled": false,
-    "_layoutSize": {
-      "__type__": "cc.Size",
-      "width": 800,
-      "height": 600
+    "_materials": [
+      {
+        "__uuid__": "eca5d2f2-8ef6-41c2-bbe6-f9c79d09c432"
+      }
+    ],
+    "_srcBlendFactor": 770,
+    "_dstBlendFactor": 771,
+    "_spriteFrame": {
+      "__uuid__": "47584db2-65a1-479e-926d-0d133c7e4a63"
     },
-    "_resize": 0,
-    "_N$layoutType": 3,
-    "_N$padding": 0,
-    "_N$cellSize": {
-      "__type__": "cc.Size",
-      "width": 40,
-      "height": 40
+    "_type": 0,
+    "_sizeMode": 0,
+    "_fillType": 0,
+    "_fillCenter": {
+      "__type__": "cc.Vec2",
+      "x": 0,
+      "y": 0
     },
-    "_N$startAxis": 0,
-    "_N$paddingLeft": 10,
-    "_N$paddingRight": 10,
-    "_N$paddingTop": 10,
-    "_N$paddingBottom": 10,
-    "_N$spacingX": 10,
-    "_N$spacingY": 5,
-    "_N$verticalDirection": 1,
-    "_N$horizontalDirection": 0,
-    "_N$affectedByScale": false,
-    "_id": "41F902XPpHE5bt59pVj3Vf"
+    "_fillStart": 0,
+    "_fillRange": 0,
+    "_isTrimmedMode": true,
+    "_atlas": null,
+    "_id": "badr2wyedF9Jr6cFzMlN7P"
   },
   {
     "__type__": "de752dfnPhBBKD/x/FNIDFt",
@@ -546,7 +545,8 @@
       "__uuid__": "8f88b415-4578-4081-b659-5bfc8a3ad438"
     },
     "spawnCount": 20,
-    "symbolSize": 100,
+    "widthStep": 120,
+    "heightStep": 140,
     "delayTime": 1,
     "numberOfCol": 5,
     "numberOfRow": 4,

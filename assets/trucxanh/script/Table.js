@@ -5,18 +5,18 @@ cc.Class({
         table: cc.Node,
         symbolPrefab: cc.Prefab,
         spawnCount: 0,
-        symbolSize: 0,
+        widthStep: 100,
+        heightStep: 100,
         delayTime: 0,
         numberOfCol: 0,
         numberOfRow: 0,
     },
 
     onLoad() {
-        window.item = this;
+        this.startX = - (this.numberOfCol / 2 - 0.5) * this.widthStep
 
-        this.startX = this.table.x - (this.numberOfCol / 2) * this.symbolSize;
-        this.startY = this.table.y + (this.numberOfRow / 2) * this.symbolSize;
-        this.symbolSize = this.symbolSize + 10;
+        this.startY = (this.numberOfRow / 2 - 0.5) * this.heightStep;
+
         this.node.on("SYMBOL_HAS_CLICK", this.symbolClick, this);
         this.node.on("RESET_TABLE", this.resetTable, this);
         this.loadTable();
@@ -84,8 +84,8 @@ cc.Class({
             const row = Math.floor(i / this.numberOfCol)
 
 
-            const x = this.startX + (col * this.symbolSize);
-            const y = this.startY - (row * this.symbolSize);
+            const x = this.startX + (col * this.widthStep);
+            const y = this.startY - (row * this.heightStep);
 
             const pos = cc.v2(x, y);
             symbol.runAction(cc.sequence(
