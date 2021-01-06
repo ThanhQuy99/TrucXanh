@@ -27,22 +27,19 @@ cc.Class({
         //! call once 
         this.isFirstClick = false;
         this.matrix = [];
-        this.shuffleMatrix();
         this.symbols = [];
         this.initSymbols();
-
     },
 
     initSymbols() {
         //! call once 
-        for (let i = 0; i < this.spawnCount; ++i) {
+        for (let i = this.spawnCount - 1; i >= 0; i--) {
             let item = cc.instantiate(this.symbolPrefab);
-            this.symbols.push(item);
-            this.table.addChild(item, i, 'Symbol' + i);
+            this.symbols.unshift(item);
+            this.table.addChild(item);
             item.emit("SET_INDEX", i + 1);
             item.emit("SET_ID", this.matrix[i]);
             item.emit("HIDDEN_SYMBOL");
-
         }
         this.symbolsWins = this.symbols.slice();
         this.isCanClick = false;
@@ -63,51 +60,50 @@ cc.Class({
             symbol.setPosition(0, 0);
             symbol.emit("SHOW_COVER");
         }
-        this.resetListSymbol();
-        this.node.runAction(cc.sequence(
-            cc.delayTime(0.1 * this.symbols.length),
-            cc.callFunc(() => {
-                this.moveListSymbol();
-            }),
-            cc.delayTime(0.2 * this.symbols.length),
-            cc.callFunc(() => {
-                this.isCanClick = true;
-            }),
-        ))
+        this.showSymbols();
+    },
+    showSymbols() {
+        for (let i = this.spawnCount - 1; i >= 0; i--) {
+            const symbol = this.symbols[i];
+            symbol.emit("ENABLED_SYMBOL");
+            symbol.emit("RESET_SYMBOL", this.spawnCount - i);
+        }
+        this.scheduleOnce(() => {
+            this.moveListSymbol();
+        }, 0.1 * this.symbols.length)
     },
 
     moveListSymbol() {
         for (let i = 0; i < this.symbols.length; i++) {
             const symbol = this.symbols[i];
-
-            const col = i % this.numberOfCol;
-            const row = Math.floor(i / this.numberOfCol)
-
-
-            const x = this.startX + (col * this.widthStep);
-            const y = this.startY - (row * this.heightStep);
-
-            const pos = cc.v2(x, y);
+            const pos = this._getPosByIndex(i);
             symbol.runAction(cc.sequence(
-                cc.delayTime(0.2 * i),
-                cc.moveTo(0.2, pos).easing(cc.easeSineInOut()),
+                cc.delayTime(0.1 * i),
+                cc.moveTo(0.3, pos).easing(cc.easeBackOut()),
+                cc.callFunc(() => {
+                    if (i === this.symbols.length - 1) {
+                        this.isCanClick = true;
+                    }
+                })
             ))
         }
     },
 
-    resetListSymbol() {
-        for (let i = 0; i < this.symbols.length; i++) {
-            const symbol = this.symbols[i];
-            symbol.emit("ENABLED_SYMBOL");
-            symbol.emit("RESET_SYMBOL", i);
-        }
+    _getPosByIndex(index) {
+        const col = index % this.numberOfCol;
+        const row = Math.floor(index / this.numberOfCol)
+
+        const x = this.startX + (col * this.widthStep);
+        const y = this.startY - (row * this.heightStep);
+        return cc.v2(x, y);
     },
+
+
     hiddenListSymbols() {
         for (let i = 0; i < this.symbols.length; i++) {
             this.symbols[i].emit("HIDDEN_SYMBOL");
         }
     },
-
 
     shuffleMatrix() {
         for (let i = 0; i < this.spawnCount; i++) {

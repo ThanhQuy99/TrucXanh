@@ -88,9 +88,7 @@ cc.Class({
         const delay = i * 0.1;
         this.node.runAction(cc.sequence(
             cc.delayTime(delay),
-            cc.callFunc(() => {
-                this.node.opacity = 255;
-            }),
+            cc.fadeIn(0.1)
         ));
 
     },
